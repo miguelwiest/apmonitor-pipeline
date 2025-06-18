@@ -1,0 +1,61 @@
+name: Run Monitor Workflow
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+
+env:
+  DEFAULT_WORKFLOW_VAR: "Esta é uma variável de ambiente padrão do workflow"
+
+jobs:
+  use-env-context:
+    name: Usar Contexto ENV
+    runs-on: ubuntu-latest
+
+    env:
+      JOB_ENV_VAR: "Esta é uma variável de ambiente específica do job"
+
+    steps:
+      - name: Checkout do Código
+        uses: actions/checkout@v4
+
+      - name: Imprimir Variáveis de Ambiente
+        run: |
+          echo "Variável do Workflow (ENV): $DEFAULT_WORKFLOW_VAR"
+          echo "Variável do Job (ENV): $JOB_ENV_VAR"
+          echo "Variável definida no Repositório (APP_ENV - acessada via env): ${{ env.APP_ENV }}"
+          echo "Variável definida no Repositório (SUPPORT_EMAIL - acessada via env): ${{ env.SUPPORT_EMAIL }}"
+          # Nota: Variáveis de repositório definidas como 'APP_ENV' e 'SUPPORT_EMAIL'
+          # são automaticamente injetadas no contexto 'env' para acesso direto.
+
+
+  use-vars-context:
+    name: Usar Contexto VARS
+    runs-on: ubuntu-latest
+    needs: use-env-context
+
+    steps:
+      - name: Checkout do Código
+        uses: actions/checkout@v4
+
+      - name: Imprimir Variáveis do Repositório (VARS)
+        run: |
+          echo "Variável APP_ENV (VARS): ${{ vars.APP_ENV }}"
+          echo "Variável SUPPORT_EMAIL (VARS): ${{ vars.SUPPORT_EMAIL }}"
+
+  use-secrets-context:
+    name: Usar Contexto SECRETS
+    runs-on: ubuntu-latest
+    needs: use-vars-context
+
+    steps:
+      - name: Checkout do Código
+        uses: actions/checkout@v4
+
+      - name: Imprimir Segredo (SECRETS)
+        run: |
+          echo "Chave da API (SECRETS): ${{ secrets.API_KEY }}"
+          echo "Demonstração de máscara: A API Key é $API_KEY (também acessível como variável de ambiente)"
+          # Segredos também são injetados como variáveis de ambiente para fácil acesso.

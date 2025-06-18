@@ -1,0 +1,74 @@
+name: Diagnóstico de Variáveis e Segredos
+
+on:
+  workflow_dispatch:
+
+jobs:
+  check_essentials:
+    name: Verificar Variáveis e Segredos Essenciais
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout do Código
+        uses: actions/checkout@v4
+
+      - name: Verificar Variável APP_ENV
+        id: check_app_env
+        run: |
+          if [ -z "${{ vars.APP_ENV }}" ]; then
+            echo "::error title=Variável Ausente::A variável 'APP_ENV' não está definida ou está vazia."
+            echo "status=failed" >> "$GITHUB_OUTPUT"
+            exit 1
+          else
+            echo "::notice title=Variável OK::A variável 'APP_ENV' está definida: ${{ vars.APP_ENV }}"
+            echo "status=success" >> "$GITHUB_OUTPUT"
+          fi
+        shell: bash
+
+      - name: Verificar Segredo API_KEY
+        id: check_api_key
+        run: |
+          if [ -z "${{ secrets.API_KEY }}" ]; then
+            echo "::error title=Segredo Ausente::O segredo 'API_KEY' não está definido ou está vazio."
+            echo "status=failed" >> "$GITHUB_OUTPUT"
+            exit 1
+          else
+            echo "::notice title=Segredo OK::O segredo 'API_KEY' está definido (valor mascarado por segurança)."
+            echo "status=success" >> "$GITHUB_OUTPUT"
+          fi
+        shell: bash
+
+      - name: Gerar Resumo de Diagnóstico
+        if: always()
+        run: |
+          echo "## Diagnóstico de Configuração do Workflow" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "---" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+          echo "### Status da Verificação" >> $GITHUB_STEP_SUMMARY
+          echo "- **Variável APP_ENV:** ${{ steps.check_app_env.outcome }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Segredo API_KEY:** ${{ steps.check_api_key.outcome }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+          echo "### Sugestões para Correção" >> $GITHUB_STEP_SUMMARY
+
+          if [ "${{ steps.check_app_env.outcome }}" == "failure" ]; then
+            echo "- **Variável `APP_ENV`:** Parece que a variável de repositório `APP_ENV` não está definida ou está vazia." >> $GITHUB_STEP_SUMMARY
+            echo "  - **Como corrigir:** Navegue até **`Settings` > `Variables` > `Actions`** no seu repositório GitHub e adicione/edite a variável `APP_ENV` com um valor apropriado (ex: `dev`, `prod`)." >> $GITHUB_STEP_SUMMARY
+            echo "  - [Link direto para variáveis do repositório](https://github.com/${{ github.repository }}/settings/variables/actions)" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+          fi
+
+          if [ "${{ steps.check_api_key.outcome }}" == "failure" ]; then
+            echo "- **Segredo `API_KEY`:** O segredo `API_KEY` não está definido ou está vazio." >> $GITHUB_STEP_SUMMARY
+            echo "  - **Como corrigir:** Vá para **`Settings` > `Secrets and variables` > `Actions` > `Secrets`** no seu repositório GitHub e adicione/edite o segredo `API_KEY` com o valor correto." >> $GITHUB_STEP_SUMMARY
+            echo "  - [Link direto para segredos do repositório](https://github.com/${{ github.repository }}/settings/secrets/actions)" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+          fi
+
+          if [ "${{ steps.check_app_env.outcome }}" == "success" ] && [ "${{ steps.check_api_key.outcome }}" == "success" ]; then
+            echo "- Todas as variáveis e segredos essenciais foram verificados com sucesso. Ótimo trabalho!" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "- Por favor, corrija os itens acima e execute o workflow novamente." >> $GITHUB_STEP_SUMMARY
+          fi

@@ -1,0 +1,38 @@
+name: Deploy to Production
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    name: Deploy para Produção
+    runs-on: ubuntu-latest
+
+    environment:
+      name: production
+      url: https://appmonitor.com
+
+    steps:
+      - name: Checkout do Código
+        uses: actions/checkout@v4
+
+      - name: Simular Deploy
+        run: |
+          echo "Iniciando deploy para o ambiente de produção..."
+          echo "Domínio alvo para deploy: $PROD_DOMAIN"
+          echo "Deploy concluído com sucesso!"
+
+      - name: Resumo do Deploy
+        if: always()
+        run: |
+          echo "## Status do Deploy para Produção" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "---" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "- **Ambiente:** Production" >> $GITHUB_STEP_SUMMARY
+          echo "- **Domínio:** ${{ vars.PROD_DOMAIN }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Status:** ${{ job.status }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "Para verificar o deploy, acesse: [appmonitor.com](https://appmonitor.com)" >> $GITHUB_STEP_SUMMARY
