@@ -128,7 +128,25 @@ Nos avisos e erros que aparecerem.
 
 Nos resumos que aparecem na aba Summary de cada execução.
 
+
 Na hora de aprovar o deploy!
 
 Status do Nosso Assistente (CI Workflow)
 Você pode ver como o nosso roteiro de preparação está se saindo aqui:
+
+![image](https://github.com/user-attachments/assets/eac8a398-878b-4074-b948-4dce2ebf7773)
+
+![image](https://github.com/user-attachments/assets/4c34cd1c-da2b-4078-b19c-910ba4b65244)
+
+![image](https://github.com/user-attachments/assets/9a43164a-2cfd-4337-bf8d-a87e12bf13e1)
+
+![image](https://github.com/user-attachments/assets/0e928080-3423-4733-a3b1-5c7ee36ddea1)
+
+![image](https://github.com/user-attachments/assets/d404a06a-9884-48af-84b8-627e84a6dee5)
+
+![image](https://github.com/user-attachments/assets/5602e076-d6e2-4595-8d2e-5fe95bf6ed81)
+
+
+
+
+
